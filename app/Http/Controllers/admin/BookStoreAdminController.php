@@ -9,6 +9,7 @@ use Session;
 use Crypt;
 use Cookie;
 use Carbon;
+use File;
 
 class BookStoreAdminController extends Controller
 {
@@ -22,8 +23,8 @@ class BookStoreAdminController extends Controller
     {
         if (Session::get('is_login') == false) {
             return redirect('/');
-        } 
-        $client = new \GuzzleHttp\Client(); 
+        }
+        $client = new \GuzzleHttp\Client();
 
         $response_books =  $client->request('GET', 'localhost:8080/api/v1/books');
         $response_books = json_decode($response_books->getBody()->getContents());
@@ -31,25 +32,25 @@ class BookStoreAdminController extends Controller
         $response_category =  $client->request('GET', 'localhost:8080/api/v1/categories');
         $response_category = json_decode($response_category->getBody()->getContents());
 
-         // Get current page form url e.x. &page=1
-         $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        // Get current page form url e.x. &page=1
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
  
-         // Create a new Laravel collection from the array data
-         $itemCollection = collect($response_books->data);
+        // Create a new Laravel collection from the array data
+        $itemCollection = collect($response_books->data);
   
-         // Define how many items we want to be visible in each page
-         $perPage = 6;
+        // Define how many items we want to be visible in each page
+        $perPage = 6;
   
-         // Slice the collection to get the items to display in current page
-         $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+        // Slice the collection to get the items to display in current page
+        $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
   
-         // Create our paginator and pass it to the view
-         $paginatedItems= new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+        // Create our paginator and pass it to the view
+        $paginatedItems= new LengthAwarePaginator($currentPageItems, count($itemCollection), $perPage);
   
-         // set url path for generted links
-         $paginatedItems->setPath($request->url());
+        // set url path for generted links
+        $paginatedItems->setPath($request->url());
 
-        return view('admin-panel/components.dashboard', compact('paginatedItems','response_category'));
+        return view('admin-panel/components.dashboard', compact('paginatedItems', 'response_category'));
     }
 
     /**
@@ -61,8 +62,8 @@ class BookStoreAdminController extends Controller
     {
         if (Session::get('is_login') == false) {
             return redirect('/');
-        } 
-        $client = new \GuzzleHttp\Client(); 
+        }
+        $client = new \GuzzleHttp\Client();
         $response_category =  $client->request('GET', 'localhost:8080/api/v1/categories');
         $response_category = json_decode($response_category->getBody()->getContents());
 
@@ -76,7 +77,7 @@ class BookStoreAdminController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
+    {
         $image_path = $request->file('image')->getPathName();
         $image_mime = $request->file('image')->getmimeType();
         $image_org  = $request->file('image')->getClientOriginalName();
@@ -84,21 +85,21 @@ class BookStoreAdminController extends Controller
         
         $client = new \GuzzleHttp\Client();
         
-        $result = $client->post('localhost:8080/api/v1/book/', 
-        
+        $result = $client->post(
+            'localhost:8080/api/v1/book/',
             [
                 'headers' => [
 
                     'Authorization' => 'Bearer '.Crypt::decryptString(Cookie::get('token_jwt')),
                    
-            ], 
+            ],
           
             'multipart' => [
                 [
                     'name'     => 'image',
-    				'filename' => $image_org,
-    				'Mime-Type'=> $image_mime,
-    				'contents' => fopen( $image_path, 'r' ),
+                    'filename' => $image_org,
+                    'Mime-Type'=> $image_mime,
+                    'contents' => fopen($image_path, 'r'),
                 ],
                 [
                     'name'     => 'title',
@@ -129,15 +130,12 @@ class BookStoreAdminController extends Controller
                 ]
             ]
             
-        ]);
+        ]
+        );
 
-        if($result) {
+        if ($result) {
             return redirect()->back();
         }
-
-       
-       
-        
     }
 
     /**
@@ -161,25 +159,27 @@ class BookStoreAdminController extends Controller
     {
         if (Session::get('is_login') == false) {
             return redirect('/');
-        } 
-        $client = new \GuzzleHttp\Client(); 
+        }
+        $client = new \GuzzleHttp\Client();
         
-        $result =  $client->request('GET', 'localhost:8080/api/v1/book/edit/'.$id,
-         [
+        $result =  $client->request(
+            'GET',
+            'localhost:8080/api/v1/book/edit/'.$id,
+            [
 
             'headers' => [
 
                 'Accept' => 'application/json',
                 'Authorization' => 'Bearer '.Crypt::decryptString(Cookie::get('token_jwt')),
             ]
-        ]);
+        ]
+        );
         $result = json_decode($result->getBody()->getContents());
 
         $response_category =  $client->request('GET', 'localhost:8080/api/v1/categories');
         $response_category = json_decode($response_category->getBody()->getContents());
 
         return view('admin-panel/components.form-edit-book', compact('response_category', 'result'));
-       
     }
 
     /**
@@ -189,9 +189,105 @@ class BookStoreAdminController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        if ($request->hasFile('image')) {
+            $image_path = $request->file('image')->getPathName();
+            $image_mime = $request->file('image')->getmimeType();
+            $image_org  = $request->file('image')->getClientOriginalName();
+        
+        
+            $client = new \GuzzleHttp\Client();
+        
+            $result = $client->post(
+            'localhost:8080/api/v1/book/update',
+            [
+                'headers' => [
+
+                    'Authorization' => 'Bearer '.Crypt::decryptString(Cookie::get('token_jwt')),
+                   
+            ],
+          
+            'multipart' => [
+                [
+                    'name'     => 'image',
+                    'filename' => $image_org,
+                    'Mime-Type'=> $image_mime,
+                    'contents' => fopen($image_path, 'r'),
+                ],
+                [
+                    'name'     => 'title',
+                    'contents' => $request->input('title'),
+                ],
+                
+                [
+                    'name'     => 'author',
+                    'contents' => $request->input('author'),
+                ],
+                
+                [
+                    'name'     => 'description',
+                    'contents' => $request->input('description'),
+                ],
+                
+                [
+                    'name'     => 'link',
+                    'contents' => $request->input('link'),
+                ],
+                [
+                    'name'     => 'featured',
+                    'contents' => $request->input('featured'),
+                ],
+                [
+                    'name'     => 'category_id',
+                    'contents' => $request->input('category_id'),
+                ],
+                [
+                    'name'     => 'book_id',
+                    'contents' => $request->input('book_id'),
+                ],
+                [
+                    'name'     => '_method',
+                    'contents' => $request->input('_method'),
+                ]
+            ]
+            
+        ]
+        );
+        } else {
+            $client = new \GuzzleHttp\Client();
+        
+            $result = $client->post(
+                'localhost:8080/api/v1/book/update',
+                [
+                    'headers' => [
+    
+                        'Authorization' => 'Bearer '.Crypt::decryptString(Cookie::get('token_jwt')),
+                       
+                ],
+              
+                'form_params' => [
+                    
+                        'title'       => $request->input('title'),
+                        'author'      => $request->input('author'),
+                        'description' => $request->input('description'),
+                        'link'        => $request->input('link'),
+                        'image'       => $request->input('image'),
+                        'category_id' => $request->input('category_id') ,
+                        'featured'    => $request->input('featured') ,
+                        'book_id'     => $request->input('book_id') ,
+                        '_method'     => $request->input('_method')
+                    
+                ]
+                
+            ]
+            );
+        }
+        
+
+        if ($result) {
+            return redirect()->back();
+        }
     }
 
     /**
@@ -211,9 +307,8 @@ class BookStoreAdminController extends Controller
                 'Authorization' => 'Bearer '.Crypt::decryptString(Cookie::get('token_jwt')),
             ]
         ]);
-        if($result) {
+        if ($result) {
             return redirect()->back();
         }
-
     }
 }

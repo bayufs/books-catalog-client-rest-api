@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Input;
 
 class BookStoreController extends Controller
 {
-    protected $client; 
+    protected $client;
     protected $curent_page;
 
     public function __construct()
     {
-       $this->client =  new \GuzzleHttp\Client(); 
+        $this->client =  new \GuzzleHttp\Client();
     }
 
 
@@ -24,8 +24,6 @@ class BookStoreController extends Controller
      */
     public function index(Request $request)
     {
-       
-      
         $response_books =  $this->client->request('GET', 'localhost:8080/api/v1/books');
         $response_books = json_decode($response_books->getBody()->getContents());
         
@@ -33,7 +31,7 @@ class BookStoreController extends Controller
         $response_category =  $this->client->request('GET', 'localhost:8080/api/v1/categories');
         $response_category = json_decode($response_category->getBody()->getContents());
 
-       // Get current page form url e.x. &page=1
+        // Get current page form url e.x. &page=1
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
  
         // Create a new Laravel collection from the array data
@@ -46,7 +44,7 @@ class BookStoreController extends Controller
         $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
  
         // Create our paginator and pass it to the view
-        $paginatedItems= new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+        $paginatedItems= new LengthAwarePaginator($currentPageItems, count($itemCollection), $perPage);
  
         // set url path for generted links
         $paginatedItems->setPath($request->url());
@@ -93,8 +91,8 @@ class BookStoreController extends Controller
 
         $results =  $response_books->data;
        
-       // dd($response_books);
-        return view('frontend/components.detail', compact('results','response_category'));
+        // dd($response_books);
+        return view('frontend/components.detail', compact('results', 'response_category'));
     }
 
     /**
@@ -130,6 +128,4 @@ class BookStoreController extends Controller
     {
         //
     }
-
-
 }

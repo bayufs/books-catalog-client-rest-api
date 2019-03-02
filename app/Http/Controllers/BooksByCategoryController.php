@@ -18,6 +18,5 @@ class BooksByCategoryController extends Controller
         $results = $response_books->data;
         //dd($results);
         return view('frontend/components.page-by-category', ['results' => $results, 'response_category' => $response_category]);
-      
     }
 }

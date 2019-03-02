@@ -9,8 +9,8 @@
 </div> <!-- end of content left -->
 
 <div id="templatemo_content_right">
-        <form action="{{ url('admin/add-new-book') }}" method="post" enctype="multipart/form-data">
-            @csrf
+        <form action="{{ url('admin/edit-book') }}" method="post" enctype="multipart/form-data">
+            @csrf  @method('put')
             <div class="group">
                 <label for="">Title</label><br>
                 <input type="text" name="title" value="{{ $result->data->title }}" placeholder="Title">
@@ -50,6 +50,10 @@
                         <option value="0" {{ $result->data->featured == 0 ? 'checked' : '' }}>Show</option>
                         <option value="1" {{ $result->data->featured == 1 ? 'checked' : '' }}>Hide</option>
                     </select>
+            </div>
+            <div class="group">
+                
+                <input type="hidden" name="book_id" value="{{ $result->data->id }}" placeholder="Link">
             </div>
             <div class="group">
                 <button type="submit">Post Book</button>

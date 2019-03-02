@@ -9,13 +9,11 @@ use Crypt;
 
 class BooksAuthController extends Controller
 {
-    
-
     public function showLoginForm()
     {
         if (Session::get('is_login') == true) {
             return redirect('/');
-        } 
+        }
         return view('auth.login');
     }
 
@@ -23,7 +21,7 @@ class BooksAuthController extends Controller
     {
         if (Session::get('is_login') == true) {
             return redirect('/');
-        } 
+        }
         return view('auth.register');
     }
 
@@ -66,7 +64,6 @@ class BooksAuthController extends Controller
             ]);
 
         return redirect('/admin/dashboard');
-        
     }
 
     public function logout(Request $request)
@@ -79,7 +76,7 @@ class BooksAuthController extends Controller
             ]
         ]);
 
-        if($result) {
+        if ($result) {
             $request->session()->flush();
             Cookie::queue(Cookie::forget('token_jwt'));
             return redirect('/');

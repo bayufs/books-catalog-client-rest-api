@@ -27,10 +27,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('add-new-book', 'admin\BookStoreAdminController@store');
     Route::get('delete-book/{id}', 'admin\BookStoreAdminController@destroy');
     Route::get('edit-book/{id}', 'admin\BookStoreAdminController@edit');
-    Route::post('edit-book', 'admin\BookStoreAdminController@update');
+    Route::put('edit-book', 'admin\BookStoreAdminController@update');
 });
 
 
 
 // Route::get('/home', 'HomeController@index')->name('home');
-
