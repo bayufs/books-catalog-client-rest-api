@@ -13,6 +13,10 @@
 	<div id="templatemo_menu">
     	<ul>
             <li><a href="{{ url('/') }}" class="current">Home</a></li>
+            @if (Session::get('is_login'))
+            <li><a href="{{ url('/admin/dashboard') }}" class="current">Dasboard</a></li>    
+            @endif
+            
     	</ul>
         </div> <!-- end of menu -->
     

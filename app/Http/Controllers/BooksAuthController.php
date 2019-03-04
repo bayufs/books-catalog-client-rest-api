@@ -82,4 +82,7 @@ class BooksAuthController extends Controller
             return redirect('/');
         }
     }
+
+
+    
 }

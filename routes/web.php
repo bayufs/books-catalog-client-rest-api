@@ -20,6 +20,7 @@ Route::post('/signin', 'BooksAuthController@login');
 Route::get('/login', 'BooksAuthController@showLoginForm');
 Route::get('/register', 'BooksAuthController@showRegisterForm');
 Route::get('/logout', 'BooksAuthController@logout');
+Route::get('/refresh',  'BooksAuthController@refreshToken');
 
 Route::group(['prefix' => 'admin'], function () {
     Route::get('dashboard', 'admin\BookStoreAdminController@index');

@@ -47,8 +47,9 @@
             <div class="group">
                     <label for="">Featured</label><br>
                     <select name="featured" id="">
-                        <option value="0" {{ $result->data->featured == 0 ? 'checked' : '' }}>Show</option>
-                        <option value="1" {{ $result->data->featured == 1 ? 'checked' : '' }}>Hide</option>
+                        <option value="#">-Pilih-</option>
+                        <option value="0" {{ $result->data->featured == 0 ? 'selected' : '' }}>Show</option>
+                        <option value="1" {{ $result->data->featured == 1 ? 'selected' : '' }}>Hide</option>
                     </select>
             </div>
             <div class="group">
